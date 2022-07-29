@@ -2,7 +2,7 @@ import cv2
 import os
 
 image_folder = 'sk_set_2'
-video_name = 'exercise_2.avi'
+video_name = 'videos\\out\\exercise_2.avi'
 
 images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 frame = cv2.imread(os.path.join(image_folder, images[0]))

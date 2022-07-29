@@ -90,11 +90,12 @@ def repetitions_combined_distance(exercise):
     return distances, trainer_index, user_index
 
 
-def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier=1.0, frame_thr_multiplier=1.0, visualize_errors_flag=True):
+def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier=1.0, frame_thr_multiplier=1.0,
+                             visualize_errors_flag=True):
     frames_number = len([name for name in os.listdir(exercise + '_tester_coords')])
     joints_number = 15
     error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance, frame_thr_multiplier)
-    if len(error_frame_list)==0:
+    if len(error_frame_list) == 0:
         return
     joint_error_counter = np.zeros(
         shape=(np.max(repetition_error_list) + 1, 18))
@@ -104,7 +105,7 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
         user_image = exercise + "_tester\\" + str(frame_couple[1]) + ".png"
         user_coordinates = get_coords_from_file(exercise + '_tester', str(frame_couple[1]))
 
-        trainer_coordinates =  get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
+        trainer_coordinates = get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
         trainer_image = exercise + "_trainer\\" + str(frame_couple[1]) + ".png"
 
         joint_distances = []
@@ -119,12 +120,14 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
                 error_points.append(tuple[1])
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))
-    print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise + " è: " + str(from_jointindex_to_jointname(MCE)) + " (" + str(
-        int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: "+str(round((1-(np.sum(joint_error_counter))/(frames_number * joints_number))*100, 2))+"%")
+    print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise + " è: " + str(
+        from_jointindex_to_jointname(MCE)) + " (" + str(
+        int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: " + str(
+        round((1 - (np.sum(joint_error_counter)) / (frames_number * joints_number)) * 100, 2)) + "%")
     for i in range(joint_error_counter.shape[0]):
         MCE = np.argmax(joint_error_counter[i])
-        print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(from_jointindex_to_jointname(MCE)) + " (" + str(
-            int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: "+str(round((1-(np.sum(joint_error_counter[i]))/((frames_number/len(np.unique(repetition_error_list))) * joints_number))*100, 2))+"%")
-
-
-
+        print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(
+            from_jointindex_to_jointname(MCE)) + " (" + str(
+            int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (
+            np.sum(joint_error_counter[i])) / ((frames_number / len(
+            np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")
