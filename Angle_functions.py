@@ -1,9 +1,9 @@
-from math import acos
-
 import os
 
-from Euclidean_functions import *
-
+from fastdtw import fastdtw
+from math import acos
+#from Euclidean_functions import *
+from utility import *
 
 #####################     ANGLES FUNCTIONS       #######################
 
@@ -13,16 +13,6 @@ def angle(skeleton, A, B, C):
     v = find_vector(find_coord(skeleton, C), find_coord(skeleton, B))
     cos = np.inner(u, v).item() / (np.linalg.norm(u) * np.linalg.norm(v))
     return acos(cos)
-
-
-def find_coord(skeleton, pointer):
-    return skeleton[pointer]
-
-
-def find_vector(P, Q):
-    vect = P - Q
-    norm = np.linalg.norm(vect)
-    return vect / norm
 
 
 def retrieve_angles(skeleton):
@@ -50,25 +40,6 @@ def retrieve_angles(skeleton):
         index.append(joint)
     angles = np.array(angles)
     return angles, index
-
-
-def from_angle_to_joint_index(angle):
-    link = [0,4,1,3,5,1,0,9,8,9,8,9,8,11,10,8,9,13,12]
-    return link[angle]
-
-def from_jointname_to_jointindex(name):
-    link_n = [b'lsho', b'rsho', b'lelb', b'relb', b'lwri', b'rwri', b'lind',
-              b'rind', b'lhip', b'rhip', b'lkne', b'rkne',b'lheel', b'rhell',
-              b'lfind', b'rfind']
-    return link_n.index(name)
-
-def retrieve_angles_sequence(directory, body_part="full"):
-    sequence = []
-    for frame in os_sorted((directory)):
-        with open(directory + "/" + frame, "rb") as skeleton_file:
-            skeleton = pkl.load(skeleton_file)
-            sequence.append(retrieve_angles(skeleton, body_part=body_part)[0])
-    return sequence
 
 
 def angles_distance(anglesA, anglesB):
@@ -123,7 +94,7 @@ def sequence_angles_distance(S1, S2):
 def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1.0, frame_thr_multiplier=1.0, visualize_errors_flag = True):
     frames_number = len([name for name in os.listdir(exercise + '_tester_coords')])
     joints_number = 15
-    error_frame_list, repetition_error_list = identify_frame_errors(exercise, repetition_distance, frame_thr_multiplier)
+    error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance, frame_thr_multiplier)
     if len(error_frame_list) == 0:
         return
     print('\nang repetition_error_list ', repetition_error_list)
@@ -131,16 +102,15 @@ def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1
     joint_error_counter = np.zeros(
         shape=(np.max(repetition_error_list) + 1, 18))
     print('\njoint_error_counter ', joint_error_counter)
-    # joints_number=24
     for j in range(len(error_frame_list)):
         frame_couple = error_frame_list[j]
 
-        user_image = "squats_tester\\" + str(frame_couple[1]) + ".png"
-        user_coordinates = get_coords_from_file('squats_tester', str(frame_couple[1]))
+        user_image = exercise + "_tester\\" + str(frame_couple[1]) + ".png"
+        user_coordinates = get_coords_from_file(exercise + '_tester', str(frame_couple[1]))
         user_angles, user_angles_index = retrieve_angles(user_coordinates)
 
-        trainer_image = "squats_trainer\\" + str(frame_couple[0]) + ".png"
-        trainer_coordinates = get_coords_from_file('squats_trainer', str(frame_couple[0]))
+        trainer_image = exercise + "_trainer\\" + str(frame_couple[0]) + ".png"
+        trainer_coordinates = get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
         trainer_angles, trainer_angles_index = retrieve_angles(trainer_coordinates)
 
         joint_distances = []

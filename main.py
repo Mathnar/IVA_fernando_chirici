@@ -17,9 +17,9 @@ from Combined_functions import *
 
 RESIZE = False
 EXTRACTION_FLAG = False
-EUCLIDEAN = False
-ANGLE = True
-COMBINED = False
+EUCLIDEAN = 1
+ANGLE = 1
+COMBINED = 1
 
 EXERCISE = 'squats'
 video_path_names = ['uservideos/squat0_wrong_3.mp4']
@@ -72,12 +72,17 @@ if __name__ == '__main__':
     vis_err = True
     joint_th = pose_th = 1
     if EUCLIDEAN:
+        print('\nSTART_EUCLIDEAN')
         rep_distance = repetitions_euclidean_distance(EXERCISE)
         identify_euclidean_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+
     if ANGLE:
+        print('\nSTART_ANGLE')
         rep_distance = repetitions_angles_distance(EXERCISE)
         identify_angles_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+
     if COMBINED:
+        print('\nSTART_COMBINED')
         rep_distance = repetitions_combined_distance(EXERCISE)
         identify_combined_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
 
