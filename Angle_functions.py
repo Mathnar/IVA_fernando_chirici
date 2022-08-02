@@ -1,13 +1,12 @@
-import os
-
 from fastdtw import fastdtw
 from math import acos
-#from Euclidean_functions import *
 from utility import *
 
 #####################     ANGLES FUNCTIONS       #######################
 
 #  Calcola l'angolo in radianti tra i vettori u e v
+
+
 def angle(skeleton, A, B, C):
     u = find_vector(find_coord(skeleton, A), find_coord(skeleton, B))
     v = find_vector(find_coord(skeleton, C), find_coord(skeleton, B))
@@ -97,58 +96,41 @@ def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1
     error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance, frame_thr_multiplier)
     if len(error_frame_list) == 0:
         return
-    print('\nang repetition_error_list ', repetition_error_list)
-
     joint_error_counter = np.zeros(
         shape=(np.max(repetition_error_list) + 1, 18))
-    print('\njoint_error_counter ', joint_error_counter)
+    joint_frame_error_bridge = []
     for j in range(len(error_frame_list)):
         frame_couple = error_frame_list[j]
-
-        user_image = exercise + "_tester\\" + str(frame_couple[1]) + ".png"
         user_coordinates = get_coords_from_file(exercise + '_tester', str(frame_couple[1]))
         user_angles, user_angles_index = retrieve_angles(user_coordinates)
 
-        trainer_image = exercise + "_trainer\\" + str(frame_couple[0]) + ".png"
         trainer_coordinates = get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
         trainer_angles, trainer_angles_index = retrieve_angles(trainer_coordinates)
 
         joint_distances = []
-        print('user_ang ', user_angles, len(user_angles))
-        print('trainer_angles ', trainer_angles, len(trainer_angles))
         for i in range(len(user_angles)):
-            print('\niii ', i)
             joint_distances.append((angles_distance(user_angles[i], trainer_angles[i]), i))
-        print('\njoint dist ', joint_distances, len(joint_distances))
-
         thr = np.mean([tup[0] for tup in joint_distances]) * joint_thr_multiplier
-        print('\njoint dist ', joint_distances)
         top_tier_distances = sorted(joint_distances, key=lambda tup: tup[0], reverse=True)
-        print('\ntop_tier_distances ',top_tier_distances)
 
         error_points = []
         for tuple in top_tier_distances:
             if tuple[0] > thr:
-                coords_idx = from_angle_to_joint_index(tuple[1]) #todo la i dell'index tuple[1]  # np.where(user_sk["joint_names"][tuple[1]] == user_sk["joint_names"])
+                coords_idx = from_angle_to_joint_index(tuple[1])
+                joint_frame_error_bridge.append([error_frame_list[j], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
                 error_points.append(from_angle_to_joint_index(tuple[1]))
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
-        print('\n_debugg ')
-        print('\n len user_angles_index ', len(user_angles_index), len(user_angles_index[0]))
-        print('\nlen di errorpoints ', len(error_points))
-        print('\n erorr points ', error_points)
-        error_points = [user_angles_index[i] for i in error_points]
-        print(error_points)
 
-        errors = []
-        errors_2d = []
-        for idx in range(len(error_points)):
-            errors.append(np.reshape(find_coord(user_coordinates, from_jointname_to_jointindex(error_points[idx])), newshape=(3,)))
-            # errors_2d.append(np.reshape(find_2d_coord(user_coordinates, error_points[idx]), newshape=(3,)))
-        errors = np.array(errors)
-        # if visualize_errors_flag:
-        #     visualize_errors(trainer_sk, user_sk, trainer_image, user_image, errors, errors_2d, frame_couple)
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))
-    print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise[:exercise.find("_")] + " è: " + str(trainer_angles_index[MCE]) + " (" + str(int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: " + str(round((1 - (np.sum(joint_error_counter)) / (frames_number * joints_number)) * 100, 2)) + "%")
+    print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise + " è: " + str(
+        from_jointindex_to_jointname(MCE)) + " (" + str(
+        int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: " + str(
+        round((1 - (np.sum(joint_error_counter)) / (frames_number * joints_number)) * 100, 2)) + "%")
     for i in range(joint_error_counter.shape[0]):
         MCE = np.argmax(joint_error_counter[i])
-        print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(trainer_angles_index[MCE]) + " (" + str(int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (np.sum(joint_error_counter[i])) / ((frames_number / len(np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")
+        print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(
+            from_jointindex_to_jointname(MCE)) + " (" + str(
+            int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (
+            np.sum(joint_error_counter[i])) / ((frames_number / len(
+            np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")
+    return joint_frame_error_bridge

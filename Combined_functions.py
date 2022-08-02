@@ -1,8 +1,8 @@
 from ai import cs
-from cmath import acos
-from Euclidean_functions import *
-from Euclidean_functions import euclidean_identify_repetitions
+from cmath import acos, cos, sin
+from fastdtw import fastdtw
 
+from utility import *
 
 # Converte coordinate cartesiane in coordinate sferiche
 def carth_to_sphere(x, y, z):
@@ -100,14 +100,12 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
     joint_error_counter = np.zeros(
         shape=(np.max(repetition_error_list) + 1, 18))
 
+    joint_frame_error_bridge = []
     for j in range(len(error_frame_list)):
         frame_couple = error_frame_list[j]
-        user_image = exercise + "_tester\\" + str(frame_couple[1]) + ".png"
         user_coordinates = get_coords_from_file(exercise + '_tester', str(frame_couple[1]))
 
         trainer_coordinates = get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
-        trainer_image = exercise + "_trainer\\" + str(frame_couple[1]) + ".png"
-
         joint_distances = []
         for i in range(len(user_coordinates)):
             joint_distances.append((spheric_distance(user_coordinates[i], trainer_coordinates[i]), i))
@@ -117,6 +115,7 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
         for tuple in top_tier_distances:
             if tuple[0] > thr:
                 coords_idx = tuple[1]
+                joint_frame_error_bridge.append([error_frame_list[j], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
                 error_points.append(tuple[1])
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))
@@ -131,3 +130,4 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
             int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (
             np.sum(joint_error_counter[i])) / ((frames_number / len(
             np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")
+    return joint_frame_error_bridge

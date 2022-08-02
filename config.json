@@ -1,0 +1,9 @@
+{
+  "exercise": "squats",
+  "video_path": "uservideos/squat0_wrong_3.mp4",
+  "trainer": "false",
+  "extraction_flag" : "false",
+  "EUCLIDEAN": 1,
+  "ANGULAR": 0,
+  "COMBINED": 0
+}

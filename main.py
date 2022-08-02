@@ -1,50 +1,49 @@
-import json
-import os
-import shutil
-import time
-from math import radians, cos, sin
-
-import numpy as np
-import mediapipe as mp
-import cv2
-import moviepy.editor as mpy
-from PIL import Image
-from matplotlib import pyplot as plt
 from pose_extractor_2 import *
-# from EuclideanDistances import *
+from Euclidean_functions import *
 from Angle_functions import *
 from Combined_functions import *
 
-RESIZE = False
-EXTRACTION_FLAG = False
-EUCLIDEAN = 1
-ANGLE = 1
-COMBINED = 1
+config = json.load(open('config.json'))
 
-EXERCISE = 'squats'
-video_path_names = ['uservideos/squat0_wrong_3.mp4']
-video_names = ['squat0_wrong_3']    # s1, r_s2
 
-WORKING_FOLDER = EXERCISE + '_tester'   # squats_trainer
+
+TRAINER_FLAG = False if config['trainer'] == 'false' else True
+if TRAINER_FLAG:
+    subject = 'trainer'
+else:
+    subject = 'tester'
+RESIZE = True
+EXTRACTION_FLAG = True if config['extraction_flag'] == 'true' else False
+EUCLIDEAN = config['EUCLIDEAN']
+ANGLE = config['ANGULAR']
+COMBINED = config['COMBINED']
+POST_PROCESSING = True if config['trainer'] == 'false' else False
+EXERCISE = config['exercise']
+video_path = [config['video_path']]
+video_name = [video_path[0].split('/')[1]]
+
+WORKING_FOLDER = EXERCISE + '_' + subject
 adj = [[1, 2], [0, 3], [0, 4], [1, 5], [2, 6], [3, 7], [4], [5], [0, 9, 10], [1, 8, 11], [8, 12], [9, 13],
        [10, 14], [11, 15], [12], [13]]
 
 
+def get_video_size(cap):
+    for i, c in enumerate(cap):
+        if c is not None:
+            ret[i], frames[i] = c.read()
+    return len(frames[0])
+
+
 if __name__ == '__main__':
+    t_start = time.time()
     if EXTRACTION_FLAG:
-        empty_folders(WORKING_FOLDER)
-        cap = [cv2.VideoCapture(i) for i in video_path_names]
-        print('\nnames: ', video_path_names, '\nsize di 0: \n ', cap[0].get(cv2.CAP_PROP_FRAME_HEIGHT),
-              cap[0].get(cv2.CAP_PROP_FRAME_WIDTH))
+        range_ = 0
+        empty_folders(WORKING_FOLDER, True)
+        cap, taller = get_cap(video_path)
 
-        if RESIZE:
-            cap = resize_video(video_path_names)
-
-            # print('\nnames: ', names, '\nsize di 0: \n ', cap[0].get(cv2.CAP_PROP_FRAME_HEIGHT), cap[0].get(cv2.CAP_PROP_FRAME_WIDTH) )
-
-        frames = [None] * len(video_path_names)
-        gray = [None] * len(video_path_names)
-        ret = [None] * len(video_path_names)
+        frames = [None] * len(video_path)
+        gray = [None] * len(video_path)
+        ret = [None] * len(video_path)
 
         with mp_pose.Pose(
                 static_image_mode=True,
@@ -52,38 +51,53 @@ if __name__ == '__main__':
                 enable_segmentation=True,
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5) as pose:
-            print(pose)
             iterator = 0
-            while iterator < 600:
-                iterator = skeleton_extraction(pose, cap, iterator, ret, gray, frames, video_path_names, video_names, WORKING_FOLDER, adj)
-                # print(cap)
+
+            leng = get_video_size(cap)
+            t_proc = time.time()
+            print('\nDurata del pre processing delle informazioni: ', t_proc-t_start)
+            while iterator < leng and iterator < 500:
+
+                iterator, range_ = skeleton_extraction(pose, cap, iterator, ret, range_, frames, video_name, WORKING_FOLDER, adj, taller)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
-
             for c in cap:
                 if c is not None:
                     c.release()
             cv2.destroyAllWindows()
 
-    # confrontino
-    # euclidean_identify_repetitions()
+    t_post_p = time.time()
+    if EXTRACTION_FLAG:
+        print("\nDurata dell'estrazione degli skeletons: ", t_post_p-t_proc, "Tempo dall'inizio: ", t_post_p-t_start)
+    print('\nInizio post processing')
+    if POST_PROCESSING:
+        vis_err = True
+        joint_th = pose_th = 1
+        if EUCLIDEAN:
+            print('\nSTART_EUCLIDEAN')
+            rep_distance = repetitions_euclidean_distance(EXERCISE)
+            joint_frame_error_bridge = identify_euclidean_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
+                  "'\nPotrebbe volerci un po!")
+            error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'euclidean')
+        if ANGLE:
+            print('\nSTART_ANGLE')
+            rep_distance = repetitions_angles_distance(EXERCISE)
+            joint_frame_error_bridge = identify_angles_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
+                  "'\nPotrebbe volerci un po!")
+            error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'angular')
+        if COMBINED:
+            print('\nSTART_COMBINED')
+            rep_distance = repetitions_combined_distance(EXERCISE)
+            joint_frame_error_bridge = identify_combined_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
+                  "\nPotrebbe volerci un po!")
+            error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'combined')
+    t_end = time.time()
+    print("\nDurata del post processing: ", t_end - t_post_p, "Tempo dall'inizio: ", t_end-t_start)
 
 
-    vis_err = True
-    joint_th = pose_th = 1
-    if EUCLIDEAN:
-        print('\nSTART_EUCLIDEAN')
-        rep_distance = repetitions_euclidean_distance(EXERCISE)
-        identify_euclidean_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
 
-    if ANGLE:
-        print('\nSTART_ANGLE')
-        rep_distance = repetitions_angles_distance(EXERCISE)
-        identify_angles_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
-
-    if COMBINED:
-        print('\nSTART_COMBINED')
-        rep_distance = repetitions_combined_distance(EXERCISE)
-        identify_combined_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
 
 
