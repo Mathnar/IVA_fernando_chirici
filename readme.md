@@ -16,7 +16,7 @@ _________________________________________________
 1. **Preparazione all'uso**
 
    1. Da terminale, navigare fino alla directory del progetto
-   `cd C:\Users\...\myPoseMetrab`
+   `cd C:\Users\...\IVA_fernando_chirici`
    2. Creare un python virtual environment chiamato VTC (Virtual Training Coach)
    `python -m venv VTC`
    3. Attivare l'environment appena creato
@@ -57,13 +57,12 @@ Il codice si suddivide in tre parti:
 -> Se il flag _trainer_ è true, i valori di EUCLIDEAN / ANGULAR / COMBINED, nel config.json, non influiscono sull'esecuzione.
 
 
-
-
-
-
 **Avvio dello script**
 
 1. Da terminale già posizionato nel folder del progetto, si avvia, **in seguito alla compilazione e salvataggio del file config.json** 
 con un qualsiasi editor di testo, con `python main.py`
 
 
+**Output**
+
+L'output si può osservare sotto forma di video alla directory `IVA_fernando_chirici/videos/out/`
