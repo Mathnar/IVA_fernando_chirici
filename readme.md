@@ -13,8 +13,11 @@ Istruzioni per l'utilizzo:
 
    1. Da terminale, navigare fino alla directory del progetto
    `cd C:\Users\...\myPoseMetrab`
-
-   2. Installare i requirements
+   2. Creare un python virtual environment chiamato VTC (Virtual Training Coach)
+   `python -m venv VTC`
+   3. Attivare l'environment appena creato
+   `VTC\Scripts\activate`
+   4. Installare i requirements
    `pip install -r requirements.txt`
 
 
