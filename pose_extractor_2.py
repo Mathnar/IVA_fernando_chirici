@@ -23,8 +23,13 @@ def skeleton_extraction(pose, cap, iterator, ret, range_, frames, window_titles,
     for i, c in enumerate(cap):
         if c is not None:
             ret[i], frames[i] = c.read()
+            if iterator % 5 != 0:
+                iterator += 1
+                return iterator, range_
+
     xyz_array = np.zeros(shape=(1, 3))
     xyz_array = np.delete(xyz_array, 0, axis=0)
+
     for i, f in enumerate(frames):
         if ret[i]:
             f = cv2.cvtColor(frames[0], cv2.COLOR_BGR2RGB)
@@ -192,7 +197,7 @@ def visualize_or_save_skeleton(skeleton, iterator, adj, SAVE_FOLDER, range_, sav
     pose_ax.scatter(cds[0], cds[1], cds[2], c='green', s=300)
 
     fig.tight_layout()
-    if save and (iterator % 5) == 0 or iterator == 0:
+    if save :#and (iterator % 5) == 0 or iterator == 0:
         plt.savefig(SAVE_FOLDER + '/' + str(iterator) + '.png')
         with open(SAVE_FOLDER + '_coords/' + str(iterator) + '.txt', 'w') as f:
             f.write(str(skeleton))
@@ -261,6 +266,5 @@ def get_cap(video_path):
             taller = False
         else:
             taller = True
-
     cap = [cv2.VideoCapture(i) for i in video_path]
     return cap, taller

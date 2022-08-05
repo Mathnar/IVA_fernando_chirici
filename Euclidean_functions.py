@@ -64,9 +64,9 @@ def identify_euclidean_errors(exercise, repetition_distance, joint_thr_multiplie
     joint_frame_error_bridge = []
     for j in range(len(error_frame_list)):
         frame_couple = error_frame_list[j]
-        user_coordinates = get_coords_from_file('squats_tester', str(frame_couple[1]))
+        user_coordinates = get_coords_from_file(exercise + '_tester', str(frame_couple[1]))
 
-        trainer_coordinates = get_coords_from_file('squats_trainer', str(frame_couple[0]))
+        trainer_coordinates = get_coords_from_file(exercise + '_trainer', str(frame_couple[0]))
         joint_distances = []
         for i in range(len(user_coordinates)):
             joint_distances.append((np.linalg.norm(user_coordinates[i] - trainer_coordinates[i]),

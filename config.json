@@ -1,8 +1,8 @@
 {
-  "exercise": "squats",
-  "video_path": "uservideos/squat0_wrong_3.mp4",
-  "trainer": "false",
-  "extraction_flag" : "false",
+  "exercise": "single-lunges",
+  "video_path": "uservideos/Single-lunges/single-lunges_wrong_3.mp4",
+  "trainer": "true",
+  "extraction_flag" : "true",
   "EUCLIDEAN": 1,
   "ANGULAR": 0,
   "COMBINED": 0

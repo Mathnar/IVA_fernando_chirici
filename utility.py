@@ -153,15 +153,9 @@ def error_frame_higlight(joint_frame_error_bridge, exercise, adj, type):
             skeleton_user = get_coords_from_file(exercise + '_tester', str(item))
 
             array_of_broken_frames = np.unique(joint_frame_error_bridge[:, 1])
-            # print('\nbroken_frames ', array_of_broken_frames, '\n i ', i)
-
             if i in array_of_broken_frames:
-                # print('entro')
-
                 error_flag = True
-
                 for broken_frame in joint_frame_error_bridge:
-                    # print('\n i ', i, ' arr_brk_f ', broken_frame[1], ' joint ', broken_frame[2])
                     if i == int(broken_frame[1]):
                         list_of_errors.append(broken_frame[2])  # lista contenente i joint sbagliati i questo frame
                 correct_position = joint_frame_error_bridge[0]
@@ -205,7 +199,6 @@ def error_frame_higlight(joint_frame_error_bridge, exercise, adj, type):
             if error_flag:
                 plt.savefig('img_out_user' + '/' + str(item) + '.png')
                 for r in range(0, 4):
-                    time.sleep(1)
                     plt.savefig('img_out_user' + '/' + str(item) + '.' + str(r) + '.png')
             else:
                 plt.savefig('img_out_user' + '/' + str(item) + '.png')

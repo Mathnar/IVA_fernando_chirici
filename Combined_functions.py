@@ -115,7 +115,7 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
         for tuple in top_tier_distances:
             if tuple[0] > thr:
                 coords_idx = tuple[1]
-                joint_frame_error_bridge.append([error_frame_list[j], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
+                joint_frame_error_bridge.append([error_frame_list[j][0], error_frame_list[j][1], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
                 error_points.append(tuple[1])
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))

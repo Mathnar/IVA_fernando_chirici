@@ -62,7 +62,12 @@ def retrive_angles_PoI_sequences(exercise):
 
 def repetitions_angles_distance(exercise):
     user_sequences, user_index = retrive_angles_PoI_sequences(exercise + '_tester')
-    trainer_sequences, trainer_index = retrive_angles_PoI_sequences(exercise + '_trainer')
+    try:
+        trainer_sequences, trainer_index = retrive_angles_PoI_sequences(exercise + '_trainer')
+    except FileNotFoundError:
+        print("\nAttenzione!:\nhai avviato l'analisi di un tester senza prima riempire il dataser trainer!\nAnalizza prima un video trainer"
+              " e non dimenticare di settare il flag 'trainer' = true nel file di configurazione!")
+        exit()
     distances = []
     i = 0
     if len(user_sequences) > len(trainer_sequences):
@@ -117,7 +122,7 @@ def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1
         for tuple in top_tier_distances:
             if tuple[0] > thr:
                 coords_idx = from_angle_to_joint_index(tuple[1])
-                joint_frame_error_bridge.append([error_frame_list[j], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
+                joint_frame_error_bridge.append([error_frame_list[j][0], error_frame_list[j][1], coords_idx]) #0: trainer frame, 1:user frame, 2:joint sbagliato
                 error_points.append(from_angle_to_joint_index(tuple[1]))
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
 

@@ -28,15 +28,23 @@ adj = [[1, 2], [0, 3], [0, 4], [1, 5], [2, 6], [3, 7], [4], [5], [0, 9, 10], [1,
 
 
 def get_video_size(cap):
-    for i, c in enumerate(cap):
-        if c is not None:
-            ret[i], frames[i] = c.read()
-    return len(frames[0])
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    print(length)
+    return length
+
+
+def create_dir(EXERCISE, subject):
+    try:
+        os.mkdir(EXERCISE + '_' + subject)
+        os.mkdir(EXERCISE + '_' + subject + '_coords')
+    except FileExistsError:
+        print('\nLa cartella per questo esercizio esiste già e verrà sovrascritta ')
 
 
 if __name__ == '__main__':
     t_start = time.time()
     if EXTRACTION_FLAG:
+        create_dir(EXERCISE, subject)
         range_ = 0
         empty_folders(WORKING_FOLDER, True)
         cap, taller = get_cap(video_path)
@@ -47,17 +55,16 @@ if __name__ == '__main__':
 
         with mp_pose.Pose(
                 static_image_mode=True,
-                model_complexity=2,
+                model_complexity=1,
                 enable_segmentation=True,
-                min_detection_confidence=0.5,
-                min_tracking_confidence=0.5) as pose:
+                min_detection_confidence=0.7,
+                min_tracking_confidence=0.7) as pose:
             iterator = 0
 
-            leng = get_video_size(cap)
+            leng = get_video_size(cap[0])
             t_proc = time.time()
-            print('\nDurata del pre processing delle informazioni: ', t_proc-t_start)
+            print('\nDurata del pre processing delle informazioni: ', t_proc-t_start, 's')
             while iterator < leng and iterator < 500:
-
                 iterator, range_ = skeleton_extraction(pose, cap, iterator, ret, range_, frames, video_name, WORKING_FOLDER, adj, taller)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -67,10 +74,12 @@ if __name__ == '__main__':
             cv2.destroyAllWindows()
 
     t_post_p = time.time()
-    if EXTRACTION_FLAG:
-        print("\nDurata dell'estrazione degli skeletons: ", t_post_p-t_proc, "Tempo dall'inizio: ", t_post_p-t_start)
-    print('\nInizio post processing')
+    if TRAINER_FLAG:
+        print("\nAnalisi trainer completata! \nAvvia un'analisi tester settando dal config (1:si - 0:no) quale tipo di elaborazione vuoi effettuare!")
+    if EXTRACTION_FLAG and not TRAINER_FLAG:
+        print("\nDurata dell'estrazione degli skeletons: ", t_post_p-t_proc, "Tempo dall'inizio: ", t_post_p-t_start, 's')
     if POST_PROCESSING:
+        print('\nInizio post processing')
         vis_err = True
         joint_th = pose_th = 1
         if EUCLIDEAN:
@@ -95,7 +104,11 @@ if __name__ == '__main__':
                   "\nPotrebbe volerci un po!")
             error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'combined')
     t_end = time.time()
-    print("\nDurata del post processing: ", t_end - t_post_p, "Tempo dall'inizio: ", t_end-t_start)
+    print("Tempo dall'inizio: ", t_end-t_start, 's')
+    if not TRAINER_FLAG:
+        print("\nDurata del post processing: ", t_end - t_post_p, 's')
+
+
 
 
 
