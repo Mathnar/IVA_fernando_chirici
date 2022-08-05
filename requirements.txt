@@ -1,9 +1,10 @@
-ai==1.0.1
-ai.cs==1.0.7
+numpy
+protobuf==3.20.*
+ai
+ai.cs
 fastdtw==0.3.4
 matplotlib==3.3.4
 mediapipe==0.8.10
-numpy==1.21.6
-opencv_python_headless==4.1.2.30
+opencv_python
 Pillow==9.2.0
 scipy==1.7.3

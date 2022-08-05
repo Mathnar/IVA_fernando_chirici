@@ -7,7 +7,11 @@ Esame di Image and video Analisys
 Professore: Pietro Pala_
 _________________________________________________
 
-Istruzioni per l'utilizzo:
+**Requirements**
+
+1. Python >= 3.7
+
+**Istruzioni per l'utilizzo**
 
 1. **Preparazione all'uso**
 

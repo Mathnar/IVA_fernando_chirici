@@ -59,16 +59,14 @@ def skeleton_extraction(pose, cap, iterator, ret, range_, frames, window_titles,
                 pose_land0_relative,
                 mp_pose.POSE_CONNECTIONS,
                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            #cv2.namedWindow(window_titles[0], cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
-
             if taller:
+                cv2.namedWindow(str(window_titles[0]), cv2.WINDOW_NORMAL)
                 imS = cv2.resize(cv2.flip(f, 1), (540, 960))  # Resize image
                 cv2.imshow(window_titles[0], imS)  # Show image
             else:
+                cv2.namedWindow(str(window_titles[0]), cv2.WINDOW_NORMAL)
                 imS = cv2.resize(cv2.flip(f, 1), (960, 540))  # Resize image
                 cv2.imshow(window_titles[0], imS)  # Show image
-
-            # cv2.imshow(window_titles[0], cv2.flip(f, 1))
             break
     return iterator, range_
 
@@ -197,7 +195,7 @@ def visualize_or_save_skeleton(skeleton, iterator, adj, SAVE_FOLDER, range_, sav
     pose_ax.scatter(cds[0], cds[1], cds[2], c='green', s=300)
 
     fig.tight_layout()
-    if save :#and (iterator % 5) == 0 or iterator == 0:
+    if save:
         plt.savefig(SAVE_FOLDER + '/' + str(iterator) + '.png')
         with open(SAVE_FOLDER + '_coords/' + str(iterator) + '.txt', 'w') as f:
             f.write(str(skeleton))
