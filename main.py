@@ -54,7 +54,7 @@ if __name__ == '__main__':
         ret = [None] * len(video_path)
 
         with mp_pose.Pose(
-                static_image_mode=True,
+                static_image_mode=False,
                 model_complexity=1,
                 enable_segmentation=False,
                 min_detection_confidence=0.7,
