@@ -55,10 +55,10 @@ if __name__ == '__main__':
 
         with mp_pose.Pose(
                 static_image_mode=True,
-                model_complexity=1,
+                model_complexity=2,
                 enable_segmentation=True,
-                min_detection_confidence=0.7,
-                min_tracking_confidence=0.7) as pose:
+                min_detection_confidence=0.5,
+                min_tracking_confidence=0.5) as pose:
             iterator = 0
 
             leng = get_video_size(cap[0])
@@ -85,21 +85,21 @@ if __name__ == '__main__':
         if EUCLIDEAN:
             print('\nSTART_EUCLIDEAN')
             rep_distance = repetitions_euclidean_distance(EXERCISE)
-            joint_frame_error_bridge = identify_euclidean_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            joint_frame_error_bridge = identify_euclidean_errors(EXERCISE, rep_distance, joint_th)
             print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
                   "'\nPotrebbe volerci un po!")
             error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'euclidean')
         if ANGLE:
             print('\nSTART_ANGLE')
             rep_distance = repetitions_angles_distance(EXERCISE)
-            joint_frame_error_bridge = identify_angles_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            joint_frame_error_bridge = identify_angles_errors(EXERCISE, rep_distance, joint_th)
             print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
                   "'\nPotrebbe volerci un po!")
             error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'angular')
         if COMBINED:
             print('\nSTART_COMBINED')
             rep_distance = repetitions_combined_distance(EXERCISE)
-            joint_frame_error_bridge = identify_combined_errors(EXERCISE, rep_distance, joint_th, pose_th, vis_err)
+            joint_frame_error_bridge = identify_combined_errors(EXERCISE, rep_distance, joint_th)
             print("\nAttendere qualche secondo! E' in corso la generazione del video contenente tutte le informazioni di post processing."
                   "\nPotrebbe volerci un po!")
             error_frame_higlight(joint_frame_error_bridge, EXERCISE, adj, 'combined')

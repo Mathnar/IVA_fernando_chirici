@@ -95,10 +95,10 @@ def sequence_angles_distance(S1, S2):
     return dist / len(path), path, sequence_dist
 
 
-def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1.0, frame_thr_multiplier=1.0, visualize_errors_flag = True):
+def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1.5):
     frames_number = len([name for name in os.listdir(exercise + '_tester_coords')])
     joints_number = 15
-    error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance, frame_thr_multiplier)
+    error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance)
     if len(error_frame_list) == 0:
         return
     joint_error_counter = np.zeros(
@@ -128,13 +128,13 @@ def identify_angles_errors(exercise, repetition_distance, joint_thr_multiplier=1
 
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))
     print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise + " è: " + str(
-        from_jointindex_to_jointname(MCE)) + " (" + str(
+        from_jointindex_to_jointname(MCE))[1:] + " (# di frame con joint mal posizionato: " + str(
         int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: " + str(
         round((1 - (np.sum(joint_error_counter)) / (frames_number * joints_number)) * 100, 2)) + "%")
     for i in range(joint_error_counter.shape[0]):
         MCE = np.argmax(joint_error_counter[i])
         print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(
-            from_jointindex_to_jointname(MCE)) + " (" + str(
+            from_jointindex_to_jointname(MCE))[1:] + " (# di frame joint mal posizionato: " + str(
             int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (
             np.sum(joint_error_counter[i])) / ((frames_number / len(
             np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")

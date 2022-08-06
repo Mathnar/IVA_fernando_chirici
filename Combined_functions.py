@@ -70,7 +70,12 @@ def sequence_sphere_distance(S1, S2):
 
 def repetitions_combined_distance(exercise):
     user_sequences, user_index = retrieve_sphere_PoI_sequences(exercise + '_tester')
-    trainer_sequences, trainer_index = retrieve_sphere_PoI_sequences(exercise + '_trainer')
+    try:
+        trainer_sequences, trainer_index = retrieve_sphere_PoI_sequences(exercise + '_trainer')
+    except FileNotFoundError:
+        print("\nAttenzione!:\nhai avviato l'analisi di un tester senza prima riempire il dataser trainer!\nAnalizza prima un video trainer"
+              " e non dimenticare di settare il flag 'trainer' = true nel file di configurazione!")
+        exit()
     distances = []
     i = 0
     if len(user_sequences) > len(trainer_sequences):
@@ -90,11 +95,10 @@ def repetitions_combined_distance(exercise):
     return distances, trainer_index, user_index
 
 
-def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier=1.0, frame_thr_multiplier=1.0,
-                             visualize_errors_flag=True):
+def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier=1.5):
     frames_number = len([name for name in os.listdir(exercise + '_tester_coords')])
     joints_number = 15
-    error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance, frame_thr_multiplier)
+    error_frame_list, repetition_error_list = identify_frame_errors(repetition_distance)
     if len(error_frame_list) == 0:
         return
     joint_error_counter = np.zeros(
@@ -120,7 +124,7 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
                 joint_error_counter[repetition_error_list[j]][coords_idx] += 1
     MCE = np.argmax(np.sum(joint_error_counter, axis=0))
     print("L'articolazione che è stata maggiormente sbagliata nel corso dell'esercizio " + exercise + " è: " + str(
-        from_jointindex_to_jointname(MCE)) + " (" + str(
+        from_jointindex_to_jointname(MCE))[1:] + " (# di frame con joint mal posizionato: " + str(
         int(np.sum(joint_error_counter, axis=0)[MCE])) + ")\tSuccesso esercizio: " + str(
         round((1 - (np.sum(joint_error_counter)) / (frames_number * joints_number)) * 100, 2)) + "%")
     for i in range(joint_error_counter.shape[0]):

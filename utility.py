@@ -125,8 +125,8 @@ def identify_frame_errors(repetition_distance, thr_multiplier=1.5):
                 trainer_frame = trainer_index[trainer_repetition_num][path[i][0]]
                 error_list.append((trainer_frame, user_frame))
                 repetition_list.append(user_repetition_num)
-    print("Errori commessi: " + str(len(error_list)))
-    print("Nelle coppie di frame: " + str(error_list))
+    print("Numero di errori commessi identificati: " + str(len(error_list)))
+    # print("Nelle coppie di frame: " + str(error_list))
     # print('\n ff ', error_list[0], ' èèè ', error_list[0][1] )
     # exit()
     return error_list, repetition_list
