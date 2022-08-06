@@ -130,7 +130,7 @@ def identify_combined_errors(exercise, repetition_distance, joint_thr_multiplier
     for i in range(joint_error_counter.shape[0]):
         MCE = np.argmax(joint_error_counter[i])
         print("L'articolazione che è stata maggiormente sbagliata nel corso della ripetizione " + str(i) + " è: " + str(
-            from_jointindex_to_jointname(MCE)) + " (" + str(
+            from_jointindex_to_jointname(MCE))[1:] + " (# di frame con joint mal posizionato: " + str(
             int(joint_error_counter[i][MCE])) + ")\tSuccesso ripetizione: " + str(round((1 - (
             np.sum(joint_error_counter[i])) / ((frames_number / len(
             np.unique(repetition_error_list))) * joints_number)) * 100, 2)) + "%")
