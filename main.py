@@ -55,10 +55,10 @@ if __name__ == '__main__':
 
         with mp_pose.Pose(
                 static_image_mode=True,
-                model_complexity=2,
-                enable_segmentation=True,
-                min_detection_confidence=0.5,
-                min_tracking_confidence=0.5) as pose:
+                model_complexity=1,
+                enable_segmentation=False,
+                min_detection_confidence=0.7,
+                min_tracking_confidence=0.7) as pose:
             iterator = 0
 
             leng = get_video_size(cap[0])
