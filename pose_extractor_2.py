@@ -132,10 +132,10 @@ def normalize_centering_and_size(pose_land0, xyz_array):
 
 
 def normalize_framing(pose_land0, xyz_array):
-    lcla = pose_land0.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
-    Jhl = np.transpose(np.array([lcla.x, lcla.y, lcla.z]))
-    rcla = pose_land0.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
-    Jt = np.transpose(np.array([rcla.x, rcla.y, rcla.z]))
+    J_lsh = pose_land0.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
+    Jhl = np.transpose(np.array([J_lsh.x, J_lsh.y, J_lsh.z]))
+    J_rsh = pose_land0.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+    Jt = np.transpose(np.array([J_rsh.x, J_rsh.y, J_rsh.z]))
     Jhl = Jhl / np.linalg.norm(Jhl)
     norm2 = np.linalg.norm(Jhl)
 
