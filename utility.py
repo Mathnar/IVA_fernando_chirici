@@ -21,7 +21,7 @@ def find_vector(P, Q):
 
 
 def from_angle_to_joint_index(angle):
-    link = [0,4,1,3,5,1,0,9,8,9,8,9,8,11,10,8,9,13,12]
+    link = [1,4,2,1,3,5,5,3,2,8,8,9,8,11,10,9,9,13,12]
     return link[angle]
 
 
